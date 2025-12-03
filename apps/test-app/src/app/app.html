@@ -88,57 +88,14 @@
 
   </section>
 
-  <!-- Tables Section -->
-  <section class="component-section">
-    <h2>Tables</h2>
+  <!-- Table Section -->
+  <section class="component-section full-width">
+    <h2>Tabla de Usuarios - Con Edición y Eliminación Lógica</h2>
 
-    <h3>Client-Side Table (Sort, Filter, Pagination)</h3>
     <lib-table [data]="users" [columns]="tableColumns" [actions]="tableActions" [config]="tableConfig"
       (sortChange)="onSort($event)" (pageChange)="onPageChange($event)" (selectionChange)="onSelectionChange($event)"
-      (actionClick)="onActionClick($event)">
-    </lib-table>
-
-    <h3>Server-Side Table (Simulated Delay)</h3>
-    <lib-table [data]="serverUsers" [totalRecords]="totalServerRecords" [columns]="tableColumns"
-      [actions]="tableActions" [config]="serverTableConfig" (dataRequest)="onServerDataRequest($event)"
-      (actionClick)="onActionClick($event)">
-    </lib-table>
-
-    <h3>Virtual Scroll Table (1000 records)</h3>
-    <lib-table [data]="virtualUsers" [columns]="tableColumns" [actions]="tableActions" [config]="virtualTableConfig"
       (actionClick)="onActionClick($event)">
     </lib-table>
   </section>
 
 </main>
-
-<!-- Templates for Table Columns -->
-<ng-template #avatarTemplate let-row>
-  <div style="display: flex; align-items: center; gap: 8px;">
-    <div
-      style="width: 32px; height: 32px; border-radius: 50%; background: #e0e0e0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500;">
-      {{ getInitials(row.name) }}
-    </div>
-    <span>{{ row.name }}</span>
-  </div>
-</ng-template>
-
-<ng-template #roleTemplate let-row>
-  <span style="padding: 4px 8px; border-radius: 16px; background: #e3f2fd; color: #1976d2; font-size: 12px;">
-    {{ getRoleLabel(row.role) }}
-  </span>
-</ng-template>
-
-<ng-template #statusTemplate let-row>
-  <div style="display: flex; align-items: center; gap: 4px;">
-    <mat-icon [style.color]="row.status === 'active' ? 'green' : row.status === 'inactive' ? 'red' : 'orange'"
-      style="font-size: 18px; width: 18px; height: 18px;">
-      {{ getStatusIcon(row.status) }}
-    </mat-icon>
-    <span>{{ getStatusLabel(row.status) }}</span>
-  </div>
-</ng-template>
-
-<ng-template #salaryTemplate let-row>
-  <!--  <span style="font-family: monospace;">{{ row.salary | currency }}</span> -->
-</ng-template>

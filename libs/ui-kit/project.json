@@ -6,6 +6,29 @@
   "projectType": "library",
   "tags": [],
   "targets": {
+    "build": {
+      "executor": "@nx/angular:ng-packagr-lite",
+      "outputs": ["{workspaceRoot}/dist/libs/ui-kit"],
+      "options": {
+        "project": "libs/ui-kit/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/ui-kit/tsconfig.lib.json"
+        },
+        "development": {
+          "tsConfig": "libs/ui-kit/tsconfig.lib.json"
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "publish": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cd dist/libs/ui-kit && npm publish --registry=https://tu-servidor-nexus.com/repository/npm-hosted/"
+      },
+      "dependsOn": ["build"]
+    },
     "lint": {
       "executor": "@nx/eslint:lint"
     },
