@@ -1,24 +1,21 @@
 import type { Meta, StoryObj } from '@storybook/angular';
 import { ButtonComponent } from './button';
-import { expect, within } from '@storybook/test';
 
-// 1. Configuración General
+// Configuración General
 const meta: Meta<ButtonComponent> = {
-  title: 'Atomos/Button', // Esto crea la carpeta en el menú
+  title: 'Atomos/Button',
   component: ButtonComponent,
-  tags: ['autodocs'], // Genera la página de documentación automática
-  // Argumentos por defecto para todas las historias
+  tags: ['autodocs'],
   args: {
     label: 'Button',
     disabled: false,
     loading: false,
     fullWidth: false,
   },
-  // Mejoramos los controles en la UI
   argTypes: {
     variant: {
       control: 'select',
-      options: ['primary', 'secondary', 'outline', 'ghost', 'danger'],
+      options: ['text', 'elevated', 'filled', 'outlined', 'icon'],
     },
     size: {
       control: 'radio',
@@ -31,41 +28,40 @@ export default meta;
 
 type Story = StoryObj<ButtonComponent>;
 
-// --- VARIANTES DE COLOR ---
+// --- VARIANTES DE ESTILO ---
 
-export const Primary: Story = {
+export const Text: Story = {
   args: {
-    variant: 'primary',
-    label: 'Guardar Cambios',
+    variant: 'text',
+    label: 'Text Button',
   },
 };
 
-export const Secondary: Story = {
+export const Elevated: Story = {
   args: {
-    variant: 'secondary',
-    label: 'Cancelar',
+    variant: 'elevated',
+    label: 'Elevated Button',
   },
 };
 
-export const Outline: Story = {
+export const Filled: Story = {
   args: {
-    variant: 'outline',
-    label: 'Ver Detalles',
+    variant: 'filled',
+    label: 'Filled Button',
   },
 };
 
-export const Danger: Story = {
+export const Outlined: Story = {
   args: {
-    variant: 'danger',
-    label: 'Eliminar Cuenta',
-    icon: 'delete', // ¡Probando el icono!
+    variant: 'outlined',
+    label: 'Outlined Button',
   },
 };
 
-export const Ghost: Story = {
+export const IconButton: Story = {
   args: {
-    variant: 'ghost',
-    label: 'Leer más...',
+    variant: 'icon',
+    icon: 'favorite',
   },
 };
 
@@ -75,26 +71,42 @@ export const Small: Story = {
   args: {
     size: 'sm',
     label: 'Pequeño',
-    variant: 'primary',
+    variant: 'filled',
+  },
+};
+
+export const Medium: Story = {
+  args: {
+    size: 'md',
+    label: 'Mediano',
+    variant: 'filled',
   },
 };
 
 export const Large: Story = {
   args: {
     size: 'lg',
-    label: 'Botón Grande',
-    variant: 'primary',
+    label: 'Grande',
+    variant: 'filled',
     icon: 'rocket_launch',
   },
 };
 
 // --- ESTADOS ESPECIALES ---
 
+export const WithIcon: Story = {
+  args: {
+    variant: 'filled',
+    label: 'Con Icono',
+    icon: 'send',
+  },
+};
+
 export const Loading: Story = {
   args: {
     loading: true,
     label: 'Procesando...',
-    variant: 'primary',
+    variant: 'filled',
   },
 };
 
@@ -102,7 +114,7 @@ export const Disabled: Story = {
   args: {
     disabled: true,
     label: 'Deshabilitado',
-    variant: 'primary',
+    variant: 'filled',
   },
 };
 
@@ -110,10 +122,9 @@ export const FullWidth: Story = {
   args: {
     fullWidth: true,
     label: 'Ancho Completo',
-    variant: 'primary',
+    variant: 'filled',
   },
   parameters: {
-    // Ajuste visual para que se note el ancho completo en el canvas
-    layout: 'padded', 
+    layout: 'padded',
   }
 };

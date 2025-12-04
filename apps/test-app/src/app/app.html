@@ -17,85 +17,243 @@
     </div>
   </section>
 
-  <!-- Form Fields Section -->
-  <section class="component-section">
-    <h2>Form Fields - Validación Automática</h2>
+  <!-- Cards Section -->
+  <section class="component-section full-width">
+    <h2>Cards - Componente Personalizado</h2>
 
-    <div class="demo-row">
-      <!-- Basic Text Field -->
-      <lib-form-field label="Nombre" [(value)]="nameValue">
-      </lib-form-field>
+    <h3>Variantes de Elevación</h3>
+    <div
+      style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 24px;">
+
+      <lib-card elevation="flat" size="md">
+        <mat-card-title card-title>Card Flat</mat-card-title>
+        <mat-card-subtitle card-subtitle>Sin sombra, con borde sutil</mat-card-subtitle>
+        <div card-content>
+          <p>Esta card tiene elevación "flat" - perfecta para interfaces minimalistas.</p>
+        </div>
+        <div card-actions>
+          <button mat-button>VER MÁS</button>
+        </div>
+      </lib-card>
+
+      <lib-card elevation="raised" size="md">
+        <mat-card-title card-title>Card Raised</mat-card-title>
+        <mat-card-subtitle card-subtitle>Con sombra elevada</mat-card-subtitle>
+        <div card-content>
+          <p>Esta card tiene elevación "raised" - da sensación de profundidad y jerarquía.</p>
+        </div>
+        <div card-actions>
+          <button mat-button>VER MÁS</button>
+        </div>
+      </lib-card>
+
+      <lib-card elevation="outlined" size="md">
+        <mat-card-title card-title>Card Outlined</mat-card-title>
+        <mat-card-subtitle card-subtitle>Con borde prominente</mat-card-subtitle>
+        <div card-content>
+          <p>Esta card tiene elevación "outlined" - ideal para destacar sin sombras.</p>
+        </div>
+        <div card-actions>
+          <button mat-button>VER MÁS</button>
+        </div>
+      </lib-card>
+
     </div>
 
-    <div class="demo-row">
-      <!-- Email with automatic validation -->
-      <lib-form-field label="Email (requerido)" type="email" prefixIcon="email" [required]="true" [(value)]="nameValue">
-      </lib-form-field>
+    <h3>Variantes de Tamaño</h3>
+    <div
+      style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-bottom: 24px;">
+
+      <lib-card elevation="raised" size="sm">
+        <mat-card-title card-title>Card Pequeña</mat-card-title>
+        <div card-content>
+          <p>Tamaño compacto (sm)</p>
+        </div>
+        <div card-actions>
+          <button mat-button>ACCIÓN</button>
+        </div>
+      </lib-card>
+
+      <lib-card elevation="raised" size="md">
+        <mat-card-title card-title>Card Mediana</mat-card-title>
+        <div card-content>
+          <p>Tamaño estándar (md)</p>
+        </div>
+        <div card-actions>
+          <button mat-button>ACCIÓN</button>
+        </div>
+      </lib-card>
+
+      <lib-card elevation="raised" size="lg">
+        <mat-card-title card-title>Card Grande</mat-card-title>
+        <div card-content>
+          <p>Tamaño espacioso (lg)</p>
+        </div>
+        <div card-actions>
+          <button mat-button>ACCIÓN</button>
+        </div>
+      </lib-card>
+
     </div>
 
-    <div class="demo-row">
-      <!-- Password with minlength validation -->
-      <lib-form-field label="Contraseña (mínimo 8 caracteres)" type="password" [required]="true" [minlength]="8"
-        suffixIcon="lock" [(value)]="nameValue">
-      </lib-form-field>
-    </div>
 
-    <div class="demo-row">
-      <!-- Search with Hint -->
-      <lib-form-field label="Buscar" type="search" prefixIcon="search" hint="Escribe al menos 3 caracteres"
-        [minlength]="3" [(value)]="nameValue">
-      </lib-form-field>
-    </div>
+    <h3>Card Clickeable</h3>
+    <div
+      style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 24px;">
 
-    <div class="demo-row">
-      <!-- Phone Number with pattern -->
-      <lib-form-field label="Teléfono" type="tel" prefixIcon="phone" hint="Formato: +57 XXX XXX XXXX"
-        [(value)]="nameValue">
-      </lib-form-field>
-    </div>
+      <lib-card elevation="raised" size="md" [clickable]="true">
+        <mat-card-title card-title>Card Interactiva</mat-card-title>
+        <mat-card-subtitle card-subtitle>Pasa el mouse para ver el efecto</mat-card-subtitle>
+        <div card-content>
+          <p>Esta card es clickeable y tiene efectos hover. Ideal para navegación o selección.</p>
+        </div>
+      </lib-card>
 
-    <div class="demo-row">
-      <!-- Number with min/max validation -->
-      <lib-form-field label="Edad (18-100)" type="number" [required]="true" [min]="18" [max]="100"
-        [(value)]="nameValue">
-      </lib-form-field>
-    </div>
+      <lib-card elevation="outlined" size="md" [clickable]="true">
+        <mat-card-title card-title>Otra Card Clickeable</mat-card-title>
+        <mat-card-subtitle card-subtitle>Con borde outlined</mat-card-subtitle>
+        <div card-content>
+          <p>Combina diferentes estilos con la funcionalidad clickeable.</p>
+        </div>
+      </lib-card>
 
-    <div class="demo-row">
-      <!-- Date Field -->
-      <lib-form-field label="Fecha de nacimiento" type="date" [required]="true" [(value)]="nameValue">
-      </lib-form-field>
-    </div>
-
-    <div class="demo-row">
-      <!-- Required Field -->
-      <lib-form-field label="Campo requerido" [required]="true" [(value)]="nameValue">
-      </lib-form-field>
-    </div>
-
-    <div class="demo-row">
-      <!-- Disabled Field -->
-      <lib-form-field label="Campo deshabilitado" [disabled]="true" value="Valor">
-      </lib-form-field>
-    </div>
-
-    <div class="demo-row">
-      <!-- Field with Custom Error -->
-      <lib-form-field label="Email con error personalizado" type="email" prefixIcon="email" customError="Email inválido"
-        [(value)]="nameValue">
-      </lib-form-field>
     </div>
 
   </section>
 
   <!-- Table Section -->
-  <section class="component-section full-width">
-    <h2>Tabla de Usuarios - Con Edición y Eliminación Lógica</h2>
+  <section class="component-section">
+    <h2>Table</h2>
+    <div class="demo-row">
+      <div class="user-management">
+        <header class="page-header">
+          <h1>Gestión de Usuarios</h1>
+          <lib-button icon="add" label="Agregar Usuario" variant="filled" size="md" (action)="addUser()"></lib-button>
+        </header>
 
-    <lib-table [data]="users" [columns]="tableColumns" [actions]="tableActions" [config]="tableConfig"
-      (sortChange)="onSort($event)" (pageChange)="onPageChange($event)" (selectionChange)="onSelectionChange($event)"
-      (actionClick)="onActionClick($event)">
-    </lib-table>
+        <lib-table [columns]="tableColumns" [actions]="tableActions" [config]="tableConfig" [data]="users"
+          [expandedRowTemplate]="expandedRowTemplate" (sortChange)="onSort($event)" (pageChange)="onPageChange($event)"
+          (selectionChange)="onSelectionChange($event)" (actionClick)="onActionClick($event)">
+        </lib-table>
+
+        <!-- Custom Templates -->
+        <ng-template #avatarTemplate let-row>
+          <div class="user-avatar-cell">
+            @if (row.avatar) {
+            <img [src]="row.avatar" [alt]="row.name" class="avatar">
+            } @else {
+            <div class="avatar-placeholder">
+              {{ getInitials(row.name) }}
+            </div>
+            }
+            <span>{{ row.name }}</span>
+          </div>
+        </ng-template>
+
+        <ng-template #statusTemplate let-row>
+          <mat-chip-set>
+            <mat-chip [highlighted]="true" [class]="'status-' + row.status">
+              <mat-icon [class]="'status-icon-' + row.status">
+                {{ getStatusIcon(row.status) }}
+              </mat-icon>
+              {{ getStatusLabel(row.status) }}
+            </mat-chip>
+          </mat-chip-set>
+        </ng-template>
+
+        <ng-template #roleTemplate let-row>
+          <mat-chip-set>
+            <mat-chip [class]="'role-' + row.role">
+              {{ getRoleLabel(row.role) }}
+            </mat-chip>
+          </mat-chip-set>
+        </ng-template>
+
+        <ng-template #salaryTemplate let-row>
+          <span class="salary-cell">
+            {{ row.salary }}
+          </span>
+        </ng-template>
+
+        <ng-template #expandedRowTemplate let-row>
+          <div class="expanded-row-content">
+            <div class="expanded-header">
+              <mat-icon class="user-icon">person</mat-icon>
+              <h3>Detalles de {{ row.name }}</h3>
+            </div>
+
+            <div class="expanded-body">
+              <div class="expanded-section">
+                <h4>
+                  <mat-icon>info</mat-icon>
+                  Información Personal
+                </h4>
+                <div class="info-grid">
+                  <div class="info-item">
+                    <mat-icon>badge</mat-icon>
+                    <div>
+                      <label>ID</label>
+                      <span>{{ row.id }}</span>
+                    </div>
+                  </div>
+                  <div class="info-item">
+                    <mat-icon>email</mat-icon>
+                    <div>
+                      <label>Email</label>
+                      <span>{{ row.email }}</span>
+                    </div>
+                  </div>
+                  <div class="info-item">
+                    <mat-icon>business</mat-icon>
+                    <div>
+                      <label>Departamento</label>
+                      <span>{{ row.department }}</span>
+                    </div>
+                  </div>
+                  <div class="info-item">
+                    <mat-icon>event</mat-icon>
+                    <div>
+                      <label>Fecha de Ingreso</label>
+                      <span>{{ row.joinDate }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="expanded-section">
+                <h4>
+                  <mat-icon>work</mat-icon>
+                  Información Laboral
+                </h4>
+                <div class="info-grid">
+                  <div class="info-item">
+                    <mat-icon>work</mat-icon>
+                    <div>
+                      <label>Rol</label>
+                      <span>{{ getRoleLabel(row.role) }}</span>
+                    </div>
+                  </div>
+                  <div class="info-item">
+                    <mat-icon>payments</mat-icon>
+                    <div>
+                      <label>Salario</label>
+                      <span>{{ row.salary }}</span>
+                    </div>
+                  </div>
+                  <div class="info-item">
+                    <mat-icon>analytics</mat-icon>
+                    <div>
+                      <label>Estado</label>
+                      <span>{{ getStatusLabel(row.status) }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+    </div>
   </section>
 
 </main>

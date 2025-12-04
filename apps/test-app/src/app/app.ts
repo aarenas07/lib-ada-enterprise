@@ -45,6 +45,7 @@ import {
   TableColumn,
   TableComponent,
   TableConfig,
+  CardComponent,
 } from '@organizacion/ui-kit';
 
 interface User {
@@ -64,7 +65,6 @@ interface User {
   imports: [
     FormsModule,
     ReactiveFormsModule,
-    AsyncPipe,
     MatAutocompleteModule,
     MatBadgeModule,
     MatBottomSheetModule,
@@ -102,6 +102,7 @@ interface User {
     ThemeToggleComponent,
     TableComponent,
     ButtonComponent,
+    CardComponent,
     FormFieldComponent
   ],
   providers: [provideNativeDateAdapter()],
@@ -386,8 +387,6 @@ export class App {
     selectable: true,
     expandable: false,
     showGlobalFilter: true,
-    mode: 'server-side',
-    filterDebounceMs: 500,
     pageSizeOptions: [5, 10, 20],
     defaultPageSize: 5
   };
@@ -398,7 +397,6 @@ export class App {
     selectable: true,
     expandable: false,
     showGlobalFilter: true,
-    virtualScroll: true,
     density: 'compact',
     stickyHeader: true
   };
@@ -528,45 +526,31 @@ export class App {
     ];
   }
 
-  // Event Handlers
   onSort(event: any) {
     console.log('Sort changed:', event);
-    // Aquí implementarías la lógica de sorting con tu backend
   }
 
   onPageChange(event: any) {
     console.log('Page changed:', event);
-    // Aquí implementarías la paginación con tu backend
   }
 
   onSelectionChange(selectedUsers: User[]) {
     console.log('Selected users:', selectedUsers);
-    // Aquí podrías habilitar acciones en masa
+  }
+  onActionClick(event: { action: TableAction<User>, row: User }) {
+    console.log('Action clicked:', event.action.label, 'on user:', event.row.name);
   }
 
-  onActionClick(event: { action: TableAction<User>; row: User }) {
-    console.log(
-      'Action clicked:',
-      event.action.label,
-      'on user:',
-      event.row.name
-    );
-  }
-
-  // Action Methods
   addUser() {
     console.log('Adding new user...');
-    // Implementa tu lógica para agregar usuario
   }
 
   editUser(user: User) {
     console.log('Editing user:', user);
-    // Abre un dialog o navega a edición
   }
 
   viewUser(user: User) {
     console.log('Viewing user:', user);
-    // Abre un dialog con detalles completos
   }
 
   deactivateUser(user: User) {
@@ -583,7 +567,6 @@ export class App {
 
   sendEmail(user: User) {
     console.log('Sending email to:', user.email);
-    // Implementa envío de email
   }
 
   deleteUser(user: User) {
@@ -595,7 +578,7 @@ export class App {
     }
   }
 
-  // Utility Methods
+
   getInitials(name: string): string {
     return name
       .split(' ')
@@ -633,16 +616,15 @@ export class App {
     return labels[role];
   }
 
-  // New Demo Methods
+
   onServerDataRequest(event: { page: number; pageSize: number; sort?: any; filter?: string }) {
     console.log('Server data requested:', event);
-    // Simulate API call
     setTimeout(() => {
       const startIndex = event.page * event.pageSize;
       const endIndex = startIndex + event.pageSize;
 
-      // Filter logic (simulated server-side)
-      let filteredData = [...this.users, ...this.users, ...this.users]; // Multiply data for demo
+
+      let filteredData = [...this.users, ...this.users, ...this.users];
       if (event.filter) {
         filteredData = filteredData.filter(u =>
           u.name.toLowerCase().includes(event.filter!.toLowerCase()) ||
@@ -650,7 +632,6 @@ export class App {
         );
       }
 
-      // Sort logic (simulated server-side)
       if (event.sort && event.sort.active && event.sort.direction !== '') {
         filteredData.sort((a: any, b: any) => {
           const isAsc = event.sort!.direction === 'asc';
@@ -662,6 +643,8 @@ export class App {
       this.serverUsers = filteredData.slice(startIndex, endIndex);
     }, 500);
   }
+
+
 
   generateVirtualData() {
     const data: User[] = [];

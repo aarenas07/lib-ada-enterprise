@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ViewChild, OnInit, TemplateRef, signal, computed, DestroyRef, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild, OnInit, TemplateRef, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatSortModule, MatSort, Sort } from '@angular/material/sort';
@@ -11,12 +11,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { SelectionModel } from '@angular/cdk/collections';
-import { ScrollingModule } from '@angular/cdk/scrolling';
 import { FormsModule } from '@angular/forms';
 import { trigger, state, style, transition, animate } from '@angular/animations';
-import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 // ==================== INTERFACES ====================
 
@@ -55,11 +51,6 @@ export interface TableConfig {
   stickyHeader?: boolean;
   density?: 'comfortable' | 'compact' | 'spacious';
   zebraStriping?: boolean;
-
-  // New Critical Features
-  mode?: 'client-side' | 'server-side';
-  virtualScroll?: boolean;
-  filterDebounceMs?: number;
 }
 
 export interface TableState<T = any> {
@@ -67,8 +58,6 @@ export interface TableState<T = any> {
   error: string | null;
   data: T[];
   totalRecords: number;
-  currentPage?: number;
-  pageSize?: number;
 }
 
 // ==================== COMPONENT ====================
@@ -88,8 +77,7 @@ export interface TableState<T = any> {
     MatMenuModule,
     MatInputModule,
     MatFormFieldModule,
-    MatProgressSpinnerModule,
-    ScrollingModule
+    MatProgressSpinnerModule
   ],
   animations: [
     trigger('detailExpand', [
@@ -116,429 +104,20 @@ export interface TableState<T = any> {
       transition('expanded <=> collapsed', animate('300ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
     ]),
   ],
-  template: `
-    <div class="generic-table-container" [attr.data-density]="config.density || 'comfortable'">
-      
-      <!-- Global Filter -->
-      <div class="table-toolbar" *ngIf="config.showGlobalFilter">
-        <mat-form-field appearance="outline" class="global-filter">
-          <mat-label>Buscar en toda la tabla</mat-label>
-          <input matInput 
-                 [(ngModel)]="globalFilterValue" 
-                 (ngModelChange)="onFilterChange($event)"
-                 placeholder="Filtrar...">
-          <mat-icon matPrefix>search</mat-icon>
-          @if (globalFilterValue) {
-            <button matSuffix mat-icon-button (click)="clearGlobalFilter()">
-              <mat-icon>close</mat-icon>
-            </button>
-          }
-        </mat-form-field>
-
-        <!-- Selection Info -->
-        @if (config.selectable && selection.hasValue()) {
-          <div class="selection-info">
-            <span>{{ selection.selected.length }} seleccionado(s)</span>
-            <button mat-button (click)="clearSelection()">
-              <mat-icon>clear</mat-icon>
-              Limpiar selección
-            </button>
-          </div>
-        }
-      </div>
-
-      <!-- Loading State -->
-      @if (state().loading) {
-        <div class="loading-state">
-          <mat-spinner diameter="50"></mat-spinner>
-          <p>Cargando datos...</p>
-        </div>
-      }
-
-      <!-- Error State -->
-      @if (state().error && !state().loading) {
-        <div class="error-state">
-          <mat-icon>error_outline</mat-icon>
-          <h3>Error al cargar datos</h3>
-          <p>{{ state().error }}</p>
-        </div>
-      }
-
-      <!-- Empty State -->
-      @if (!state().loading && !state().error && state().data.length === 0) {
-        <div class="empty-state">
-          <mat-icon>inbox</mat-icon>
-          <h3>No hay datos disponibles</h3>
-          <p>No se encontraron registros para mostrar</p>
-        </div>
-      }
-
-      <!-- Table -->
-      @if (!state().loading && !state().error && state().data.length > 0) {
-        <div class="table-wrapper" [class.sticky-header]="config.stickyHeader">
-          
-          <!-- Virtual Scroll Viewport -->
-          @if (config.virtualScroll) {
-            <cdk-virtual-scroll-viewport itemSize="48" class="virtual-viewport">
-              <table mat-table 
-                     [dataSource]="dataSource" 
-                     matSort 
-                     (matSortChange)="onSortChange($event)"
-                     [class.zebra-striping]="config.zebraStriping"
-                     multiTemplateDataRows>
-                
-                <!-- Content Projection for Columns -->
-                <ng-container *ngTemplateOutlet="tableContent"></ng-container>
-              </table>
-            </cdk-virtual-scroll-viewport>
-          } @else {
-            <!-- Standard Table -->
-            <table mat-table 
-                   [dataSource]="dataSource" 
-                   matSort 
-                   (matSortChange)="onSortChange($event)"
-                   [class.zebra-striping]="config.zebraStriping"
-                   multiTemplateDataRows>
-              
-              <!-- Content Projection for Columns -->
-              <ng-container *ngTemplateOutlet="tableContent"></ng-container>
-            </table>
-          }
-
-          <!-- Shared Table Content Template -->
-          <ng-template #tableContent>
-            <!-- Checkbox Column -->
-            @if (config.selectable) {
-              <ng-container matColumnDef="select">
-                <th mat-header-cell *matHeaderCellDef>
-                  <mat-checkbox 
-                    (change)="$event ? toggleAllRows() : null"
-                    [checked]="selection.hasValue() && isAllSelected()"
-                    [indeterminate]="selection.hasValue() && !isAllSelected()"
-                    color="primary">
-                  </mat-checkbox>
-                </th>
-                <td mat-cell *matCellDef="let row">
-                  <mat-checkbox 
-                    (click)="$event.stopPropagation()"
-                    (change)="$event ? selection.toggle(row) : null"
-                    [checked]="selection.isSelected(row)"
-                    color="primary">
-                  </mat-checkbox>
-                </td>
-              </ng-container>
-            }
-
-            <!-- Expand Icon Column -->
-            @if (config.expandable && expandedRowTemplate) {
-              <ng-container matColumnDef="expand">
-                <th mat-header-cell *matHeaderCellDef style="width: 48px;"></th>
-                <td mat-cell *matCellDef="let row">
-                  <button mat-icon-button 
-                          (click)="toggleExpandRow(row); $event.stopPropagation()"
-                          [attr.aria-label]="'Expandir fila'">
-                    <mat-icon [@rotateIcon]="expandedRow === row ? 'expanded' : 'collapsed'">
-                      expand_more
-                    </mat-icon>
-                  </button>
-                </td>
-              </ng-container>
-            }
-
-            <!-- Data Columns -->
-            @for (column of visibleColumns(); track column.key) {
-              <ng-container [matColumnDef]="column.key">
-                <th mat-header-cell 
-                    *matHeaderCellDef 
-                    [mat-sort-header]="column.sortable !== false ? column.key : ''"
-                    [disabled]="column.sortable === false"
-                    [style.width]="column.width"
-                    [class.sticky-column]="column.sticky">
-                  {{ column.label }}
-                </th>
-                <td mat-cell 
-                    *matCellDef="let row" 
-                    [style.width]="column.width"
-                    [class.sticky-column]="column.sticky">
-                  
-                  @if (column.cellTemplate) {
-                    <ng-container *ngTemplateOutlet="column.cellTemplate; context: { $implicit: row, column: column }">
-                    </ng-container>
-                  } @else {
-                    {{ formatCellValue(row[column.key], column.dataType) }}
-                  }
-                </td>
-              </ng-container>
-            }
-
-            <!-- Actions Column -->
-            @if (actions.length > 0) {
-              <ng-container matColumnDef="actions">
-                <th mat-header-cell *matHeaderCellDef class="actions-column">Acciones</th>
-                <td mat-cell *matCellDef="let row" class="actions-column">
-                  <div class="action-buttons">
-                    @for (action of getVisibleActions(row).slice(0, 3); track action.label) {
-                      <button mat-icon-button 
-                              [color]="action.color || 'primary'"
-                              [disabled]="isActionDisabled(action, row)"
-                              (click)="onActionClick(action, row, $event)">
-                        <mat-icon>{{ action.icon }}</mat-icon>
-                      </button>
-                    }
-                    
-                    @if (getVisibleActions(row).length > 3) {
-                      <button mat-icon-button [matMenuTriggerFor]="moreMenu">
-                        <mat-icon>more_vert</mat-icon>
-                      </button>
-                      <mat-menu #moreMenu="matMenu">
-                        @for (action of getVisibleActions(row).slice(3); track action.label) {
-                          <button mat-menu-item 
-                                  [disabled]="isActionDisabled(action, row)"
-                                  (click)="onActionClick(action, row, $event)">
-                            <mat-icon>{{ action.icon }}</mat-icon>
-                            <span>{{ action.label }}</span>
-                          </button>
-                        }
-                      </mat-menu>
-                    }
-                  </div>
-                </td>
-              </ng-container>
-            }
-
-            <!-- Expandable Row -->
-            @if (config.expandable && expandedRowTemplate) {
-              <ng-container matColumnDef="expandedDetail">
-                <td mat-cell *matCellDef="let row" [attr.colspan]="displayedColumns().length">
-                  <div class="row-detail" 
-                       [@detailExpand]="row === expandedRow ? 'expanded' : 'collapsed'"
-                       (@detailExpand.done)="onAnimationDone($event, row)">
-                    <div class="row-detail-inner">
-                      <ng-container *ngTemplateOutlet="expandedRowTemplate; context: { $implicit: row }">
-                      </ng-container>
-                    </div>
-                  </div>
-                </td>
-              </ng-container>
-            }
-
-            <tr mat-header-row *matHeaderRowDef="displayedColumns(); sticky: config.stickyHeader"></tr>
-            <tr mat-row 
-                *matRowDef="let row; columns: displayedColumns();"
-                [class.expanded-row]="expandedRow === row && config.expandable"
-                [class.clickable-row]="config.expandable"
-                (click)="onRowClick(row)">
-            </tr>
-            
-            @if (config.expandable && expandedRowTemplate) {
-              <tr mat-row 
-                  *matRowDef="let row; columns: ['expandedDetail']" 
-                  class="detail-row"
-                  [class.detail-row-visible]="expandedRow === row"></tr>
-            }
-          </ng-template>
-        </div>
-
-        <!-- Paginator -->
-        <mat-paginator 
-          [length]="state().totalRecords"
-          [pageSize]="config.defaultPageSize || 10"
-          [pageSizeOptions]="config.pageSizeOptions || [5, 10, 25, 50, 100]"
-          [showFirstLastButtons]="true"
-          (page)="onPageChange($event)"
-          aria-label="Seleccionar página">
-        </mat-paginator>
-      }
-    </div>
-  `,
-  styles: [`
-    .generic-table-container {
-      width: 100%;
-      background: white;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    .table-toolbar {
-      padding: 16px;
-      display: flex;
-      gap: 16px;
-      align-items: center;
-      background: #fafafa;
-      border-bottom: 1px solid #e0e0e0;
-    }
-
-    .global-filter {
-      flex: 1;
-      max-width: 400px;
-    }
-
-    .selection-info {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: rgba(0, 0, 0, 0.6);
-      
-      span {
-        font-size: 14px;
-      }
-    }
-
-    .table-wrapper {
-      overflow-x: auto;
-      max-height: 600px;
-      
-      &.sticky-header {
-        max-height: 600px;
-        overflow-y: auto;
-      }
-    }
-
-    .virtual-viewport {
-      height: 600px;
-      width: 100%;
-      
-      table {
-        width: 100%;
-      }
-    }
-
-    table {
-      width: 100%;
-      
-      &.zebra-striping tr:nth-child(even) {
-        background-color: #f5f5f5;
-      }
-    }
-
-    .mat-mdc-header-cell {
-      font-weight: 600;
-      color: rgba(0, 0, 0, 0.87);
-    }
-
-    .sticky-column {
-      position: sticky;
-      left: 0;
-      z-index: 2;
-      background: white;
-      
-      &.mat-mdc-header-cell {
-        z-index: 3;
-      }
-    }
-
-    .actions-column {
-      text-align: right;
-      width: 150px;
-    }
-
-    .action-buttons {
-      display: flex;
-      justify-content: flex-end;
-      gap: 4px;
-    }
-
-    .clickable-row {
-      cursor: pointer;
-      
-      &:hover {
-        background-color: #f5f5f5;
-      }
-    }
-
-    .expanded-row {
-      background-color: #e3f2fd !important;
-    }
-
-    .row-detail {
-      overflow: hidden;
-    }
-
-    .row-detail-inner {
-      padding: 16px;
-    }
-
-    .detail-row {
-      height: 0;
-      visibility: hidden;
-    }
-
-    .detail-row.detail-row-visible {
-      visibility: visible;
-    }
-
-    /* Density Variants */
-    [data-density="compact"] {
-      .mat-mdc-cell, .mat-mdc-header-cell {
-        padding: 8px 12px;
-      }
-    }
-
-    [data-density="comfortable"] {
-      .mat-mdc-cell, .mat-mdc-header-cell {
-        padding: 12px 16px;
-      }
-    }
-
-    [data-density="spacious"] {
-      .mat-mdc-cell, .mat-mdc-header-cell {
-        padding: 16px 20px;
-      }
-    }
-
-    /* States */
-    .loading-state, .error-state, .empty-state {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 64px 24px;
-      text-align: center;
-      
-      mat-icon {
-        font-size: 64px;
-        width: 64px;
-        height: 64px;
-        margin-bottom: 16px;
-        opacity: 0.5;
-      }
-      
-      h3 {
-        margin: 0 0 8px 0;
-        color: rgba(0, 0, 0, 0.87);
-      }
-      
-      p {
-        margin: 0;
-        color: rgba(0, 0, 0, 0.6);
-      }
-    }
-
-    .error-state mat-icon {
-      color: #f44336;
-    }
-  `]
+  templateUrl: './table.html',
+  styleUrls: ['./table.scss']
 })
 export class TableComponent<T = any> implements OnInit {
   @Input() columns: TableColumn<T>[] = [];
   @Input() actions: TableAction<T>[] = [];
   @Input() config: TableConfig = {};
   @Input() expandedRowTemplate?: TemplateRef<any>;
-
-  // New input for server-side pagination
-  @Input() totalRecords?: number;
-
   @Input() set data(value: T[]) {
-    this.state.update(s => ({
-      ...s,
+    this.state.set({
+      ...this.state(),
       data: value,
-      // Only update totalRecords from data length if not provided explicitly
-      // and if we are in client-side mode
-      totalRecords: this.totalRecords ?? (this.config.mode === 'server-side' ? s.totalRecords : value.length)
-    }));
-
-    // Update dataSource
-    this.dataSource.data = value;
+      totalRecords: value.length
+    });
   }
 
   @Output() sortChange = new EventEmitter<Sort>();
@@ -547,15 +126,6 @@ export class TableComponent<T = any> implements OnInit {
   @Output() rowClick = new EventEmitter<T>();
   @Output() actionClick = new EventEmitter<{ action: TableAction<T>, row: T }>();
 
-  // New outputs
-  @Output() dataRequest = new EventEmitter<{
-    page: number;
-    pageSize: number;
-    sort?: Sort;
-    filter?: string;
-  }>();
-  @Output() filterChange = new EventEmitter<string>();
-
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -563,9 +133,6 @@ export class TableComponent<T = any> implements OnInit {
   selection = new SelectionModel<T>(true, []);
   expandedRow: T | null = null;
   globalFilterValue = '';
-
-  private filterSubject = new Subject<string>();
-  private destroyRef = inject(DestroyRef);
 
   state = signal<TableState<T>>({
     loading: false,
@@ -589,27 +156,8 @@ export class TableComponent<T = any> implements OnInit {
 
   ngOnInit() {
     this.dataSource.data = this.state().data;
-
-    // Fix memory leak with takeUntilDestroyed
-    this.selection.changed
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        this.selectionChange.emit(this.selection.selected);
-      });
-
-    // Setup filter debounce
-    this.filterSubject.pipe(
-      debounceTime(this.config.filterDebounceMs || 300),
-      distinctUntilChanged(),
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe(filterValue => {
-      this.applyFilterLogic(filterValue);
-      this.filterChange.emit(filterValue);
-
-      // If server-side, emit data request
-      if (this.config.mode === 'server-side') {
-        this.emitDataRequest();
-      }
+    this.selection.changed.subscribe(() => {
+      this.selectionChange.emit(this.selection.selected);
     });
   }
 
@@ -620,51 +168,25 @@ export class TableComponent<T = any> implements OnInit {
 
   // ==================== FILTERING ====================
 
-  onFilterChange(value: string) {
-    this.filterSubject.next(value);
-  }
-
   applyGlobalFilter(filterValue: string) {
-    // Legacy method support, now delegates to subject
-    this.onFilterChange(filterValue);
-  }
-
-  private applyFilterLogic(filterValue: string) {
-    if (this.config.mode !== 'server-side') {
-      this.dataSource.filter = filterValue.trim().toLowerCase();
-    }
+    this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
   clearGlobalFilter() {
     this.globalFilterValue = '';
-    this.onFilterChange('');
+    this.dataSource.filter = '';
   }
 
   // ==================== SORTING ====================
 
   onSortChange(sort: Sort) {
     this.sortChange.emit(sort);
-    if (this.config.mode === 'server-side') {
-      this.emitDataRequest();
-    }
   }
 
   // ==================== PAGINATION ====================
 
   onPageChange(event: PageEvent) {
     this.pageChange.emit(event);
-    if (this.config.mode === 'server-side') {
-      this.emitDataRequest();
-    }
-  }
-
-  private emitDataRequest() {
-    this.dataRequest.emit({
-      page: this.paginator ? this.paginator.pageIndex : 0,
-      pageSize: this.paginator ? this.paginator.pageSize : (this.config.defaultPageSize || 10),
-      sort: this.sort,
-      filter: this.globalFilterValue
-    });
   }
 
   // ==================== SELECTION ====================
@@ -755,7 +277,7 @@ export class TableComponent<T = any> implements OnInit {
     this.state.update(s => ({
       ...s,
       data,
-      totalRecords: totalRecords || (this.config.mode === 'server-side' ? s.totalRecords : data.length),
+      totalRecords: totalRecords || data.length,
       loading: false,
       error: null
     }));

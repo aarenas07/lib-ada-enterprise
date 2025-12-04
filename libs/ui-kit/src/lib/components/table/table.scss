@@ -1,1 +1,179 @@
+// Componente Table - Estilos usando Angular Material Design 3
 
+.generic-table-container {
+  width: 100%;
+  background: var(--mat-sys-surface);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table-toolbar {
+  padding: 16px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  background: var(--mat-sys-surface-container);
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+}
+
+.global-filter {
+  flex: 1;
+  max-width: 400px;
+}
+
+.selection-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--mat-sys-on-surface-variant);
+  
+  span {
+    font-size: 14px;
+  }
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  max-height: 600px;
+  
+  &.sticky-header {
+    max-height: 600px;
+    overflow-y: auto;
+  }
+}
+
+table {
+  width: 100%;
+  
+  &.zebra-striping tr:nth-child(even) {
+    background-color: var(--mat-sys-surface-container-highest);
+  }
+}
+
+.mat-mdc-header-cell {
+  font-weight: 600;
+  color: var(--mat-sys-on-surface) !important;
+  background-color: var(--mat-sys-surface-container-low) !important;
+}
+
+.mat-mdc-cell {
+  color: var(--mat-sys-on-surface) !important;
+}
+
+.sticky-column {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--mat-sys-surface);
+  
+  &.mat-mdc-header-cell {
+    z-index: 3;
+    background: var(--mat-sys-surface-container-low) !important;
+  }
+}
+
+.actions-column {
+  text-align: right;
+  width: 150px;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.clickable-row {
+  cursor: pointer;
+  
+  &:hover {
+    background-color: var(--mat-sys-surface-container-high) !important;
+  }
+}
+
+.expanded-row {
+  background-color: var(--mat-sys-primary-container) !important;
+}
+
+.row-detail {
+  overflow: hidden;
+  background-color: var(--mat-sys-surface-container);
+}
+
+.row-detail-inner {
+  padding: 16px;
+}
+
+.detail-row {
+  height: 0;
+  visibility: hidden;
+}
+
+.detail-row.detail-row-visible {
+  visibility: visible;
+}
+
+/* Density Variants */
+[data-density="compact"] {
+  .mat-mdc-cell, .mat-mdc-header-cell {
+    padding: 8px 12px;
+  }
+}
+
+[data-density="comfortable"] {
+  .mat-mdc-cell, .mat-mdc-header-cell {
+    padding: 12px 16px;
+  }
+}
+
+[data-density="spacious"] {
+  .mat-mdc-cell, .mat-mdc-header-cell {
+    padding: 16px 20px;
+  }
+}
+
+/* States */
+.loading-state, .error-state, .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  text-align: center;
+  
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+    color: var(--mat-sys-on-surface-variant);
+  }
+  
+  h3 {
+    margin: 0 0 8px 0;
+    color: var(--mat-sys-on-surface);
+  }
+  
+  p {
+    margin: 0;
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.error-state mat-icon {
+  color: var(--mat-sys-error);
+}
+
+// Asegurar que las filas de la tabla usen colores del tema
+.mat-mdc-row {
+  background-color: var(--mat-sys-surface);
+  
+  &:hover {
+    background-color: var(--mat-sys-surface-container);
+  }
+}
+
+.mat-mdc-header-row {
+  background-color: var(--mat-sys-surface-container-low);
+}
