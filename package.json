@@ -6,7 +6,9 @@
     "start": "nx serve",
     "build": "nx build",
     "test": "nx test",
-    "storybook": "nx storybook ui-kit"
+    "storybook": "nx storybook ui-kit",
+    "tokens:build": "node libs/ui-kit/tools/tokens/build.js",
+    "tokens:watch": "nodemon libs/ui-kit/tools/tokens/build.js"
   },
   "private": true,
   "dependencies": {

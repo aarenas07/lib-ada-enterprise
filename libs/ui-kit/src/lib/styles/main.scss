@@ -1,0 +1,48 @@
+// src/lib/styles/main.scss
+
+// 1. Traemos Angular Material (Esencial)
+@use '@angular/material' as mat;
+
+// 2. Traemos TUS tokens generados (El ADN)
+// Usamos @import porque es un archivo CSS puro generado por el script
+@import './tokens/output/variables.css';
+
+// 3. Traemos el Mapeo (El Traductor)
+@import './theme-mapping.scss';
+
+// 4. Configuración Base (El Setup)
+// Esto debe ir dentro de un mixin para que la aplicación que consuma tu librería
+// pueda incluirlo UNA sola vez en su styles.scss global.
+@mixin bds-core-theme() {
+
+    // A. Incluir estilos base de Material (core, botones, cards, etc.)
+    // Esto genera el CSS necesario para que los componentes funcionen.
+    @include mat.core();
+
+    // B. Inicializar el tema M3 de Material
+    // Le pasamos una config "dummy" porque nuestros tokens van a sobrescribir todo esto.
+    html {
+        @include mat.theme((color: (theme-type: light, // Base
+                    primary: mat.$azure-palette,
+                    tertiary: mat.$blue-palette,
+                ),
+                typography: (brand-family: 'Roboto',
+                    plain-family: 'Roboto',
+                ),
+                density: 0));
+
+        // C. ¡LA MAGIA! Sobrescribimos las variables de Material con las tuyas
+        @include map-bds-to-material();
+    }
+
+    // D. Opcional: Clases de utilidad para tus propios componentes
+    // Si quieres usar tus tokens directamente en tus componentes custom
+    .bds-surface {
+        background-color: var(--bds-sys-surface);
+        color: var(--bds-sys-on-surface);
+    }
+
+    .bds-primary {
+        color: var(--bds-sys-primary);
+    }
+}

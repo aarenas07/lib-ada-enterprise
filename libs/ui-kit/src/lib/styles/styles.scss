@@ -1,4 +1,4 @@
-@use 'sass:map';
+/* @use 'sass:map';
 @use 'sass:meta';
 
 // Custom Schemes from SicofERP_Design_System_V3.json
@@ -672,8 +672,5 @@ $blue-lt-scheme: (
     surface-container-highest: #e2e2e9
 );
 
-@mixin apply-sys-variables($scheme) {
-    @each $key, $value in $scheme {
-        --mat-sys-#{$key}: #{$value};
-    }
-}
+
+} */

@@ -1,47 +1,37 @@
-/* Import Angular Material styles using the @use rule */
-@use '@angular/material' as mat;
+/* @use '@angular/material' as mat;
 @use '../../../libs/ui-kit/src/lib/styles/styles.scss' as sicof-theme;
 
-/* Set the height of the html and body elements to 100% */
 html,
 body {
   height: 100%;
 }
 
-/* Define base styles for the body element */
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
-/*
- * Define styles for the html element:
- * - Apply a color scheme that supports both light and dark modes.
- * - Include Angular Material theme configuration with custom color, typography, and density settings.
- */
 html {
   color-scheme: light dark;
 
-  /* Apply Angular Material theme with custom settings */
+
   @include mat.theme((color: mat.$violet-palette,
-      /* Use violet color palette */
+
       typography: Roboto,
-      /* Set typography to Roboto */
+  
       density: 0
-      /* Set density to 0 for default spacing */
+    
     ));
 
-  /* Define styles for light theme */
+
   &.theme-light {
     color-scheme: light;
   }
-
-  /* Define styles for dark theme */
   &.theme-dark {
     color-scheme: dark;
   }
 
-  /* Custom Sicof Themes */
+
   &.sicof-theme-light {
     @include sicof-theme.apply-sys-variables(sicof-theme.$light-scheme);
     color-scheme: light;
@@ -106,4 +96,22 @@ html {
     @include sicof-theme.apply-sys-variables(sicof-theme.$cyan-lt-scheme);
     color-scheme: light;
   }
-}
+} */
+
+
+// projects/test-app/src/styles.scss
+
+// 1. Importar fuentes (Material las necesita)
+@use '../../../libs/ui-kit/src/lib/styles/main.scss' as bds;
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+// 2. Importar tu librería de estilos
+// Nota: La ruta depende de cómo exportes tus estilos. 
+// Si es relativo dentro del monorepo:
+
+// 3. ¡Activar el sistema!
+@include bds.bds-core-theme();
+
+// --- ESTO ES TODO ---
+// Ya tienes Material configurado con tus tokens.

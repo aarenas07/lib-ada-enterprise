@@ -11,11 +11,22 @@
     "@angular/material": "^20.0.0",
     "@angular/cdk": "^20.0.0"
   },
-  "keywords": ["angular", "ui-kit", "components", "ada"],
+  "keywords": [
+    "angular",
+    "ui-kit",
+    "components",
+    "ada"
+  ],
   "author": "Tu nombre o empresa",
   "license": "MIT",
   "publishConfig": {
     "registry": "https://tu-servidor-nexus.com/repository/npm-hosted/",
     "access": "restricted"
+  },
+  "scripts": {
+    "start": "ng serve",
+    "build": "ng build",
+    "tokens:build": "node libs/ui-kit/tools/tokens/build.js",
+    "tokens:watch": "nodemon libs/ui-kit/tools/tokens/build.js"
   }
 }
